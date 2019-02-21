@@ -6,15 +6,17 @@ import App from './App';
 import { createStore } from 'redux'
 import { Provider } from 'react-redux'
 
-const reducer = (state = {count: 86}, action) => {
+const reducer = (state = {currentUser: null, currentChatroom: null}, action) => {
 
   // REDUCERS MUST BE PURE FUNCTIONS
-  // ?? NOT DESTRUCTIVELY CHANGING THE OBJECT
+  // DO NOT DESTRUCTIVELY CHANGE THE OBJECT
   switch(action.type) {
-    case 'INCREMENT':
-      return {count: state.count + action.amount}
-    case 'DECREMENT':
-      return {count: state.count - 1}
+    case 'CHANGE_USER':
+      return {...state,
+        currentUser: action.payload}
+    case 'CHANGE_CHATROOM':
+      return {...state,
+        currentChatroom: action.payload}
     default:
       return state
   }
