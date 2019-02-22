@@ -4,17 +4,22 @@ import AppHeader from './components/AppHeader.js'
 import SideBar from './components/SideBar.js'
 import Client from './components/Client.js'
 import { Button, Checkbox, Form } from 'semantic-ui-react'
-
 import { connect } from 'react-redux'
+import {
+  BrowserRouter as Router,
+  Redirect,
+  Route
+} from "react-router-dom";
 
 class App extends Component {
 
   componentDidMount(){
     fetch('http://localhost:3000/api/v1/users')
     .then(res => res.json())
-    .then(users =>
-      this.props.setUser(users[0])
-    )
+    .then(users => this.props.setUser(users[0]))
+    fetch('http://localhost:3000/api/v1/chatrooms')
+    .then(res => res.json())
+    .then(chatrooms => this.props.setChatroom(chatrooms[0]))
   }
 
   renderLogin(){
@@ -47,12 +52,14 @@ class App extends Component {
   }
 
   render() {
-    console.log("my props are: ", this.props);
+    console.log("App : my props are: ", this.props);
 
     return (
-      <div className="App">
-        {this.renderLogin()}
-      </div>
+      <Router>
+        <div className="App">
+        <Route exact path="/" render={()=> this.renderComponents()} />
+        </div>
+      </Router>
     )
   }
 } // End of App component
