@@ -1,68 +1,69 @@
 import React, { Component } from 'react';
 import './App.css';
+import 'semantic-ui-css/semantic.min.css'
 import AppHeader from './components/AppHeader.js'
 import SideBar from './components/SideBar.js'
 import Client from './components/Client.js'
-import { Button, Checkbox, Form } from 'semantic-ui-react'
+import LoginForm from './components/LoginForm.js'
+import SignUpForm from './components/SignUpForm.js'
+import { Grid } from 'semantic-ui-react'
 import { connect } from 'react-redux'
-import {
-  BrowserRouter as Router,
-  Redirect,
-  Route
-} from "react-router-dom";
+import { Switch, Route, withRouter} from "react-router-dom";
 
 class App extends Component {
 
   componentDidMount(){
-    fetch('http://localhost:3000/api/v1/users')
-    .then(res => res.json())
-    .then(users => this.props.setUser(users[0]))
-    fetch('http://localhost:3000/api/v1/chatrooms')
-    .then(res => res.json())
-    .then(chatrooms => this.props.setChatroom(chatrooms[0]))
-  }
-
-  renderLogin(){
-    return(
-      <Form>
-        <Form.Field>
-          <label>First Name</label>
-          <input placeholder='First Name' />
-        </Form.Field>
-        <Form.Field>
-          <label>Last Name</label>
-          <input placeholder='Last Name' />
-        </Form.Field>
-        <Form.Field>
-          <Checkbox label='I agree to the Terms and Conditions' />
-        </Form.Field>
-        <Button type='submit'>Submit</Button>
-      </Form>
-    )
+    let token = localStorage.getItem("token")
+    if (token){
+      fetch(`http://localhost:3000/api/v1/current_user`, {
+        headers: {
+          "Authorization": token
+        }
+      })
+      .then(res => res.json())
+      .then(res => {
+        this.props.setUser(res)
+      })
+    } else {
+      this.props.history.push("/login")
+    }
   }
 
   renderComponents(){
     return(
-      <>
-        <AppHeader />
-        <SideBar />
-        <Client />
-      </>
+      <Grid divided>
+        <Grid.Column width={4}>
+          <SideBar />
+        </Grid.Column>
+        <Grid.Column width={12}>
+          <Client />
+        </Grid.Column>
+      </Grid>
     )
   }
+
+  logout = () => {
+		this.props.setUser(null)
+		localStorage.removeItem("token")
+		this.props.history.push("/login")
+	}
 
   render() {
     console.log("App : my props are: ", this.props);
-
     return (
-      <Router>
-        <div className="App">
-        <Route exact path="/" render={()=> this.renderComponents()} />
-        </div>
-      </Router>
+      <div className="App">
+        <AppHeader logout={this.logout}/>
+        <Switch>
+          <Route exact path="/" render={()=> this.renderComponents()} />
+          <Route path="/login" render={(routerProps) => <LoginForm login={this.login} {...routerProps}/>}/>
+          <Route path="/signup" render={(routerProps) => <SignUpForm signup={this.signup} {...routerProps}/>}/>
+        </Switch>
+      </div>
     )
   }
 } // End of App component
+
+// <Route exact path="/" render={()=> this.renderComponents()} />
 
 const mapStateToProps = (state) => {
   return {
@@ -76,4 +77,4 @@ const mapDispatchToProps = {
     setChatroom: (chatroom) => ({type: 'CHANGE_CHATROOM', payload: chatroom})
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App))

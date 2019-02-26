@@ -5,6 +5,7 @@ import App from './App';
 // import * as serviceWorker from './serviceWorker';
 import { createStore } from 'redux'
 import { Provider } from 'react-redux'
+import { BrowserRouter as Router } from 'react-router-dom'
 
 const reducer = (state = {currentUser: null, currentChatroom: null}, action) => {
 
@@ -12,8 +13,13 @@ const reducer = (state = {currentUser: null, currentChatroom: null}, action) => 
   // DO NOT DESTRUCTIVELY CHANGE THE OBJECT
   switch(action.type) {
     case 'CHANGE_USER':
-      return {...state,
-        currentUser: action.payload}
+      if (action.payload === null){
+        return {currentUser: null, currentChatroom: null}
+      } else {
+        return {...state,
+          currentUser: action.payload
+        }
+      }
     case 'CHANGE_CHATROOM':
       return {...state,
         currentChatroom: action.payload}
@@ -30,10 +36,12 @@ const store = createStore(reducer)
 // })
 
 ReactDOM.render(
+  <Router>
   <Provider store={store}>
     <App />
-  </Provider>,
-  document.getElementById('root')
+  </Provider>
+  </Router>
+  ,document.getElementById('root')
 );
 
 // If you want your app to work offline and load faster, you can change

@@ -1,51 +1,85 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
-import { Comment, Header } from 'semantic-ui-react'
+import { Form, Button, Comment, Header } from 'semantic-ui-react'
 
+const DEFAULT_STATE = {
+  inputMessage: '',
+  messages: {}
+}
 
 class Client extends Component {
+  state = DEFAULT_STATE
 
-  // componentDidMount(){
-  //   fetch('http://localhost:3000/api/v1/users')
-  //   .then(res => res.json())
-  //   .then(users => this.props.setUser(users[0]))
-  //   fetch('http://localhost:3000/api/v1/chatrooms')
-  //   .then(res => res.json())
-  //   .then(chatrooms => this.props.setChatroom(chatrooms[0]))
-  // }
+  handleChange = (e) => {
+    this.setState({
+      [e.target.name]: e.target.value
+    })
+  }
+
+  handleSubmit = (e) => {
+    e.preventDefault()
+    fetch(`http://localhost:3000/api/v1/messages/`, {
+      method: "POST",
+      headers:{
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      body:JSON.stringify({
+        "username": this.props.currentUser.username,
+        "user_id": this.props.currentUser.id,
+        "chatroom_id": this.props.currentChatroom.id,
+        "message_content": this.state.inputMessage
+      })
+    })
+    //NEED to get a new currentChatroom from backend
+    .then(res => res.json())
+    .then(() => this.fetchChatroom())
+    .then(() => this.setState({
+      inputMessage:''
+    }))
+  }
+
+  fetchChatroom(){
+    fetch(`http://localhost:3000/api/v1/chatrooms/${this.props.currentChatroom.id}`)
+    .then(res => res.json())
+    .then(res => (this.props.setChatroom(res))
+    )
+  }
+
 
   getMessages(){
-    // debugger
     return(
-      // (a==b ? true : false)
-      (this.props.currentChatroom) ?
       this.props.currentChatroom.messages.map(message => {
         return (
-          <Comment.Content>
-            <Comment.Author as='a'>{message.user_id}</Comment.Author>
-            <Comment.Metadata>
+          <div
+            key={message.id}
+            id={message.id}>
+              {message.username}:
+              {message.message_content}
 
-            </Comment.Metadata>
-            <Comment.Text>{message.message}</Comment.Text>
-          </Comment.Content>
+          </div>
         )
       })
-      : null
     )
   }
 
   render(){
-    console.log("Client : my props are: ", this.props);
-
     return(
-      <>
-        <Comment.Group>
-          <Header>
-            Comments
-          </Header>
-          {this.getMessages()}
-        </Comment.Group>
-      </>
+      <Comment.Group>
+        <Header>
+        CLIENT STUFF
+        </Header>
+        { (this.props.currentChatroom) ?
+            this.getMessages()
+          :
+            null
+        }
+        <Form reply onSubmit={(e) => this.handleSubmit(e)}>
+          <Form.TextArea onChange={this.handleChange} value={this.state.inputMessage} name="inputMessage" placeholder="Write a message here."/>
+          <Button content='Add Reply' labelPosition='left' icon='edit' primary />
+        </Form>
+      </Comment.Group>
+
     )
   }
 }  // End of Client Component
