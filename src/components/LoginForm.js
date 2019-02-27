@@ -12,7 +12,6 @@ class LoginForm extends Component {
   state = DEFAULT_STATE
 
   login = (e) => {
-    // e.preventDefault()
     console.log("LOGGING IN")
     fetch("http://localhost:3000/api/v1/login", {
       method: "POST",
@@ -78,7 +77,6 @@ const mapStateToProps = (state) => {
     currentChatroom: state.currentChatroom
   }
 }
-
 const mapDispatchToProps = {
     // login: (username, password) =>
     //   ({type: 'LOGIN', username: username, password: password})

@@ -63,18 +63,15 @@ class App extends Component {
   }
 } // End of App component
 
-// <Route exact path="/" render={()=> this.renderComponents()} />
-
 const mapStateToProps = (state) => {
   return {
     currentUser: state.currentUser,
     currentChatroom: state.currentChatroom
   }
 }
-
 const mapDispatchToProps = {
-    setUser: (user) => ({type: 'CHANGE_USER', payload: user}),
-    setChatroom: (chatroom) => ({type: 'CHANGE_CHATROOM', payload: chatroom})
+    setUser: (user) => ({type: 'CHANGE_USER', payload: user})
+    // setChatroom: (chatroom) => ({type: 'CHANGE_CHATROOM', payload: chatroom})
 }
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App))

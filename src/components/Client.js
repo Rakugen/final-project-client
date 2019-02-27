@@ -32,6 +32,7 @@ class Client extends Component {
       })
     })
     //NEED to get a new currentChatroom from backend
+    //and get the list to refresh
     .then(res => res.json())
     .then(() => this.fetchChatroom())
     .then(() => this.setState({
@@ -67,19 +68,27 @@ class Client extends Component {
     return(
       <Comment.Group>
         <Header>
-        CLIENT STUFF
+        { (this.props.currentChatroom) ?
+            this.props.currentChatroom.name
+          :
+            null
+        }
         </Header>
         { (this.props.currentChatroom) ?
             this.getMessages()
           :
             null
         }
-        <Form reply onSubmit={(e) => this.handleSubmit(e)}>
-          <Form.TextArea onChange={this.handleChange} value={this.state.inputMessage} name="inputMessage" placeholder="Write a message here."/>
-          <Button content='Add Reply' labelPosition='left' icon='edit' primary />
-        </Form>
-      </Comment.Group>
+        { (this.props.currentChatroom) ?
+            <Form reply onSubmit={(e) => this.handleSubmit(e)}>
+              <Form.TextArea onChange={this.handleChange} value={this.state.inputMessage} name="inputMessage" placeholder="Write a message here."/>
+              <Button content='Add Reply' labelPosition='left' icon='edit' primary />
+            </Form>
+          :
+            <div>Select a chatroom</div>
+        }
 
+      </Comment.Group>
     )
   }
 }  // End of Client Component
@@ -90,9 +99,8 @@ const mapStateToProps = (state) => {
     currentChatroom: state.currentChatroom
   }
 }
-
 const mapDispatchToProps = {
-    setUser: (user) => ({type: 'CHANGE_USER', payload: user}),
+    // setUser: (user) => ({type: 'CHANGE_USER', payload: user}),
     setChatroom: (chatroom) => ({type: 'CHANGE_CHATROOM', payload: chatroom})
 }
 
