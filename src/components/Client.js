@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import { Form, Button, Comment, Header } from 'semantic-ui-react'
+import { ActionCable } from 'react-actioncable-provider'
 
 const DEFAULT_STATE = {
   inputMessage: '',
@@ -41,6 +42,7 @@ class Client extends Component {
   }
 
   fetchChatroom(){
+    console.log("fetch");
     fetch(`http://localhost:3000/api/v1/chatrooms/${this.props.currentChatroom.id}`)
     .then(res => res.json())
     .then(res => (this.props.setChatroom(res))
@@ -49,6 +51,8 @@ class Client extends Component {
 
 
   getMessages(){
+    console.log("GetMessages");
+
     return(
       this.props.currentChatroom.messages.map(message => {
         return (
@@ -64,31 +68,46 @@ class Client extends Component {
     )
   }
 
+  // renderMessages(){
+  //
+  // }
+
+  addMessage(message){
+    console.log("addMessage: ", message)
+  }
+
   render(){
     return(
-      <Comment.Group>
-        <Header>
-        { (this.props.currentChatroom) ?
-            this.props.currentChatroom.name
-          :
-            null
-        }
-        </Header>
-        { (this.props.currentChatroom) ?
-            this.getMessages()
-          :
-            null
-        }
-        { (this.props.currentChatroom) ?
-            <Form reply onSubmit={(e) => this.handleSubmit(e)}>
-              <Form.TextArea onChange={this.handleChange} value={this.state.inputMessage} name="inputMessage" placeholder="Write a message here."/>
-              <Button content='Add Reply' labelPosition='left' icon='edit' primary />
-            </Form>
-          :
-            <div>Select a chatroom</div>
-        }
+      <div className="feed">
+      <ActionCable
+      channel={{channel: 'MessageChannel'}}
+      onReceived={() => {
+        this.fetchChatroom()
+      }} />
+        <Comment.Group>
+          <Header>
+          { (this.props.currentChatroom) ?
+              this.props.currentChatroom.name
+            :
+              null
+          }
+          </Header>
+          { (this.props.currentChatroom) ?
+              this.getMessages()
+            :
+              null
+          }
+          { (this.props.currentChatroom) ?
+              <Form reply onSubmit={(e) => this.handleSubmit(e)}>
+                <Form.TextArea onChange={this.handleChange} value={this.state.inputMessage} name="inputMessage" placeholder="Write a message here."/>
+                <Button content='Add Reply' labelPosition='left' icon='edit' primary />
+              </Form>
+            :
+              <div>Select a chatroom</div>
+          }
 
-      </Comment.Group>
+        </Comment.Group>
+      </div>
     )
   }
 }  // End of Client Component

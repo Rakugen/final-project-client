@@ -1,13 +1,15 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
-import { Checkbox, Icon, Table, Form, Button, Comment, Header, Modal } from 'semantic-ui-react'
+import { Table, Form, Button, Comment, Header, Modal } from 'semantic-ui-react'
 
 const DEFAULT_STATE = {
   openNewModal: false,
   openSearchModal: false,
-  chatroom_name: '',
+  inputChatroomName: '',
   description: '',
-  chatrooms: []
+  chatrooms: [],
+  userChatroomIDs: [1,2,3,4],
+  dimmer: null
 }
 
 class SideBar extends Component {
@@ -26,7 +28,7 @@ class SideBar extends Component {
   showSearchModal = dimmer => () => this.setState({ dimmer, openSearchModal: true })
   closeSearchModal = () => this.setState({ openSearchModal: false })
 
-  handleClick = (e) => {
+  handleChatroomClick = (e) => {
     fetch(`http://localhost:3000/api/v1/chatrooms/${parseInt(e.target.id)}`)
     .then(res => res.json())
     .then(res => (
@@ -41,6 +43,23 @@ class SideBar extends Component {
     })
   }
 
+  handleJoinButton = (e) => {
+
+    fetch(`http://localhost:3000/api/v1/joins/`, {
+      method: "POST",
+      headers:{
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      body:JSON.stringify({
+        "user_id": this.props.currentUser.id,
+        "chatroom_id": parseInt(e.target.id)
+      })
+    })
+    .then(() => this.fetchUser())
+    e.target.disabled = true
+  }
+
   createChatroom = (e) => {
     fetch(`http://localhost:3000/api/v1/chatrooms/`, {
       method: "POST",
@@ -49,7 +68,7 @@ class SideBar extends Component {
         "Content-Type": "application/json"
       },
       body:JSON.stringify({
-        "name": this.state.chatroom_name,
+        "name": this.state.inputChatroomName,
         "admin_id": this.props.currentUser.id,
         "description": this.state.description
       })
@@ -88,13 +107,12 @@ class SideBar extends Component {
   }
 
   getChatrooms(){
-    console.log("SideBar: ", this.state);
     return(
       (this.props.currentUser) ?
         this.props.currentUser.chatrooms.map(chatroom => {
           return (
             <div
-              onClick={(e) => this.handleClick(e)}
+              onClick={(e) => this.handleChatroomClick(e)}
               key={chatroom.id}
               id={chatroom.id}>
                 {chatroom.name}
@@ -106,12 +124,23 @@ class SideBar extends Component {
   }
 
   tableContent(){
+    // const roomIDs = this.props.currentUser.chatrooms.map(chatroom => {
+    //   return chatroom.id
+    // })
+    // this.setState({
+    //   userChatroomIDs: roomIDs
+    // })
+
     let table_contents = (
       this.state.chatrooms.map(chatroom => {
         return (
           <Table.Row key={chatroom.id}>
             <Table.Cell collapsing>
-              <Checkbox slider />
+              {(this.state.userChatroomIDs.includes(chatroom.id)) ?
+                <Button disabled={true} id={chatroom.id} content="Join" color="purple" onClick={(e) => this.handleJoinButton(e)}/>
+                :
+                <Button disabled={false} id={chatroom.id} content="Join" color="purple" onClick={(e) => this.handleJoinButton(e)}/>
+              }
             </Table.Cell>
             <Table.Cell>{chatroom.name}</Table.Cell>
             <Table.Cell>{chatroom.description}</Table.Cell>
@@ -120,36 +149,31 @@ class SideBar extends Component {
       })
     )
 
-      return (
-        <Table compact celled definition>
-          <Table.Header>
-            <Table.Row>
-              <Table.HeaderCell />
-              <Table.HeaderCell>Chatroom</Table.HeaderCell>
-              <Table.HeaderCell>Description</Table.HeaderCell>
+    return (
+      <Table compact celled definition>
+        <Table.Header>
+          <Table.Row>
+            <Table.HeaderCell />
+            <Table.HeaderCell>Chatroom</Table.HeaderCell>
+            <Table.HeaderCell>Description</Table.HeaderCell>
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+            {table_contents}
+        </Table.Body>
+        <Table.Footer fullWidth>
+          <Table.Row>
+            <Table.HeaderCell />
+            <Table.HeaderCell colSpan='4'>
 
-            </Table.Row>
-          </Table.Header>
-
-          <Table.Body>
-              {table_contents}
-
-          </Table.Body>
-
-          <Table.Footer fullWidth>
-            <Table.Row>
-              <Table.HeaderCell />
-              <Table.HeaderCell colSpan='4'>
-
-              </Table.HeaderCell>
-            </Table.Row>
-          </Table.Footer>
-        </Table>
-      )
+            </Table.HeaderCell>
+          </Table.Row>
+        </Table.Footer>
+      </Table>
+    )
   }
 
   render(){
-    const { openNewModal, dimmer } = this.state
 
     return(
       <Comment.Group>
@@ -169,17 +193,17 @@ class SideBar extends Component {
           onClick={this.showNewModal(true)}/>
         <Button
           content="Search Chatrooms"
-          color="olive"
+          color="teal"
           labelPosition='left'
           icon="search"
           onClick={this.showSearchModal(true)}/>
-        <Modal dimmer={dimmer} open={this.state.openNewModal} onClose={this.closeNewModal}>
+        <Modal dimmer={this.state.dimmer} open={this.state.openNewModal} onClose={this.closeNewModal}>
           <Modal.Header>Create a New Chatroom</Modal.Header>
           <Modal.Actions>
             <Form>
               <Form.Field>
                  <label>Chatroom Name</label>
-                 <input onChange={this.handleChange} name="chatroom_name" placeholder='Chatroom Name' />
+                 <input onChange={this.handleChange} name="inputChatroomName" placeholder='Chatroom Name' />
               </Form.Field>
               <Form.TextArea onChange={this.handleChange} value={this.state.description} name="description" placeholder="Write the chatrooms description here:"/>
             </Form>
@@ -187,22 +211,21 @@ class SideBar extends Component {
               Cancel
             </Button>
             <Button
-              positive
+              content="Create Chatroom"
+              primary
               icon='checkmark'
               labelPosition='right'
-              content="Create Chatroom"
               onClick={this.createChatroom}
             />
           </Modal.Actions>
         </Modal>
 
-        <Modal dimmer={dimmer} open={this.state.openSearchModal} onClose={this.closeSearchModal}>
+        <Modal dimmer={this.state.dimmer} open={this.state.openSearchModal} onClose={this.closeSearchModal}>
           <Modal.Header>Search for Chatrooms</Modal.Header>
           <Modal.Actions>
             <Form>
               <Form.Field>
-                 <label>Search Chatrooms</label>
-                 <input onChange={this.handleChange} name="chatroom_name" placeholder='Chatroom Name' />
+                 <input onChange={this.handleChange} name="inputChatroomName" placeholder='Search Chatrooms' />
               </Form.Field>
             </Form>
             <Modal.Content>
@@ -216,7 +239,6 @@ class SideBar extends Component {
               icon='checkmark'
               labelPosition='right'
               content="Search"
-
             />
           </Modal.Actions>
         </Modal>

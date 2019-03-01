@@ -49,7 +49,7 @@ class App extends Component {
 	}
 
   render() {
-    console.log("App : my props are: ", this.props);
+    // console.log("App : my props are: ", this.props);
     return (
       <div className="App">
         <AppHeader logout={this.logout}/>
