@@ -18,8 +18,6 @@ class SignUpForm extends Component {
   }
 
   signUp = (e) => {
-    // e.preventDefault()
-    console.log("SIGNING UP")
     if (this.state.password === this.state.passwordConfirmation){
     fetch("http://localhost:3000/api/v1/users", {
       method: "POST",
@@ -78,7 +76,6 @@ const mapStateToProps = (state) => {
     currentChatroom: state.currentChatroom
   }
 }
-
 const mapDispatchToProps = {
     // signUp: (username, password, passwordConfirmation) =>
     //   ({type: 'SIGNUP', username: username, password: password, passwordConfirmation: passwordConfirmation})

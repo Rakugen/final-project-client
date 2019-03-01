@@ -1,16 +1,15 @@
+// import * as serviceWorker from './serviceWorker';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
-// import * as serviceWorker from './serviceWorker';
 import { createStore } from 'redux'
 import { Provider } from 'react-redux'
 import { BrowserRouter as Router } from 'react-router-dom'
+import { ActionCableProvider } from 'react-actioncable-provider'
 
 const reducer = (state = {currentUser: null, currentChatroom: null}, action) => {
 
-  // REDUCERS MUST BE PURE FUNCTIONS
-  // DO NOT DESTRUCTIVELY CHANGE THE OBJECT
   switch(action.type) {
     case 'CHANGE_USER':
       if (action.payload === null){
@@ -30,17 +29,14 @@ const reducer = (state = {currentUser: null, currentChatroom: null}, action) => 
 
 const store = createStore(reducer)
 
-// store.subscribe(() => {
-//   console.log('the new state is', store.getState())
-//   console.log('----------');
-// })
-
 ReactDOM.render(
+  <ActionCableProvider url="ws://localhost:3000/cable">
   <Router>
   <Provider store={store}>
     <App />
   </Provider>
   </Router>
+  </ActionCableProvider>
   ,document.getElementById('root')
 );
 
