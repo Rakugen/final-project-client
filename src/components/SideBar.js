@@ -1,22 +1,35 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
-import { Table, Form, Button, Comment, Header, Modal } from 'semantic-ui-react'
+import { Icon, Label, Table, Form, Button, Comment, Header, Modal } from 'semantic-ui-react'
 
 const DEFAULT_STATE = {
   openNewModal: false,
   openSearchModal: false,
   inputChatroomName: '',
   description: '',
-  chatrooms: [],
-  userChatroomIDs: [1,2,3,4],
   dimmer: null
 }
+// const COLORS = [
+//   'red',
+//   'orange',
+//   'yellow',
+//   'olive',
+//   'green',
+//   'teal',
+//   'violet',
+//   'purple',
+//   'pink',
+//   'brown',
+//   // 'grey',
+//   // 'blue',
+//   // 'black',
+// ]
 
 class SideBar extends Component {
-  state = DEFAULT_STATE
+  state = {...DEFAULT_STATE, chatrooms: [], userChatroomIDs: []}
 
   componentDidMount(){
-    fetch(`http://localhost:3000/api/v1/chatrooms/`)
+    fetch(`http://${window.location.hostname}:3000/api/v1/chatrooms/`)
     .then(res => res.json())
     .then(res => this.setState({
       chatrooms: res
@@ -25,11 +38,12 @@ class SideBar extends Component {
 
   showNewModal = dimmer => () => this.setState({ dimmer, openNewModal: true })
   closeNewModal = () => this.setState({ openNewModal: false })
+
   showSearchModal = dimmer => () => this.setState({ dimmer, openSearchModal: true })
   closeSearchModal = () => this.setState({ openSearchModal: false })
 
   handleChatroomClick = (e) => {
-    fetch(`http://localhost:3000/api/v1/chatrooms/${parseInt(e.target.id)}`)
+    fetch(`http://${window.location.hostname}:3000/api/v1/chatrooms/${parseInt(e.target.id)}`)
     .then(res => res.json())
     .then(res => (
         this.props.setChatroom(res)
@@ -45,7 +59,7 @@ class SideBar extends Component {
 
   handleJoinButton = (e) => {
 
-    fetch(`http://localhost:3000/api/v1/joins/`, {
+    fetch(`http://${window.location.hostname}:3000/api/v1/joins/`, {
       method: "POST",
       headers:{
         "Accept": "application/json",
@@ -57,11 +71,12 @@ class SideBar extends Component {
       })
     })
     .then(() => this.fetchUser())
+    .then(() => this.closeSearchModal())
     e.target.disabled = true
   }
 
   createChatroom = (e) => {
-    fetch(`http://localhost:3000/api/v1/chatrooms/`, {
+    fetch(`http://${window.location.hostname}:3000/api/v1/chatrooms/`, {
       method: "POST",
       headers:{
         "Accept": "application/json",
@@ -75,7 +90,7 @@ class SideBar extends Component {
     })
     .then(res => res.json())
     .then(res => {
-      fetch(`http://localhost:3000/api/v1/joins/`, {
+      fetch(`http://${window.location.hostname}:3000/api/v1/joins/`, {
         method: "POST",
         headers:{
           "Accept": "application/json",
@@ -87,14 +102,14 @@ class SideBar extends Component {
         })
       })
     })
-    .then(() => this.fetchUser())
     .then(() => this.setState(DEFAULT_STATE))
+    .then(() => this.fetchUser())
   }
 
   fetchUser(){
     let token = localStorage.getItem("token")
     if (token){
-      fetch(`http://localhost:3000/api/v1/current_user`, {
+      fetch(`http://${window.location.hostname}:3000/api/v1/current_user`, {
         headers: {
           "Authorization": token
         }
@@ -110,12 +125,16 @@ class SideBar extends Component {
     return(
       (this.props.currentUser) ?
         this.props.currentUser.chatrooms.map(chatroom => {
+          // color={COLORS[Math.floor(Math.random() * COLORS.length)]}
           return (
-            <div
-              onClick={(e) => this.handleChatroomClick(e)}
-              key={chatroom.id}
-              id={chatroom.id}>
+            <div key={chatroom.id}>
+              <Label className="label"
+                onClick={(e) => this.handleChatroomClick(e)}
+                color="violet"
+                id={chatroom.id}
+              >
                 {chatroom.name}
+              </Label>
             </div>
           )
         })
@@ -177,7 +196,7 @@ class SideBar extends Component {
 
     return(
       <Comment.Group>
-        <Header>
+        <Header size="large">
           Chatrooms
         </Header>
           { (this.props.currentUser) ?
@@ -186,18 +205,25 @@ class SideBar extends Component {
               null
           }
         <Button
+          className="sidebar-button"
           content="New Chatroom"
-          color="purple"
+          primary
           labelPosition='left'
           icon="plus square outline"
           onClick={this.showNewModal(true)}/>
         <Button
+          className="sidebar-button"
           content="Search Chatrooms"
-          color="teal"
+          secondary
           labelPosition='left'
           icon="search"
           onClick={this.showSearchModal(true)}/>
-        <Modal dimmer={this.state.dimmer} open={this.state.openNewModal} onClose={this.closeNewModal}>
+        <Modal
+          size="tiny"
+          dimmer={this.state.dimmer}
+          open={this.state.openNewModal}
+          onClose={this.closeNewModal}
+        >
           <Modal.Header>Create a New Chatroom</Modal.Header>
           <Modal.Actions>
             <Form>
@@ -220,7 +246,11 @@ class SideBar extends Component {
           </Modal.Actions>
         </Modal>
 
-        <Modal dimmer={this.state.dimmer} open={this.state.openSearchModal} onClose={this.closeSearchModal}>
+        <Modal
+          dimmer={this.state.dimmer}
+          open={this.state.openSearchModal}
+          onClose={this.closeSearchModal}
+        >
           <Modal.Header>Search for Chatrooms</Modal.Header>
           <Modal.Actions>
             <Form>

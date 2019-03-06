@@ -1,126 +1,30 @@
-import React, { Component } from 'react';
+import React, { Fragment } from 'react'
 import { connect } from 'react-redux'
-import { Form, Button, Comment, Header } from 'semantic-ui-react'
-import { ActionCable } from 'react-actioncable-provider'
-
-const DEFAULT_STATE = {
-  inputMessage: '',
-  messages: {}
-}
-
-class Client extends Component {
-  state = DEFAULT_STATE
-
-  handleChange = (e) => {
-    this.setState({
-      [e.target.name]: e.target.value
-    })
-  }
-
-  handleSubmit = (e) => {
-    e.preventDefault()
-    fetch(`http://localhost:3000/api/v1/messages/`, {
-      method: "POST",
-      headers:{
-        "Accept": "application/json",
-        "Content-Type": "application/json"
-      },
-      body:JSON.stringify({
-        "username": this.props.currentUser.username,
-        "user_id": this.props.currentUser.id,
-        "chatroom_id": this.props.currentChatroom.id,
-        "message_content": this.state.inputMessage
-      })
-    })
-    //NEED to get a new currentChatroom from backend
-    //and get the list to refresh
-    .then(res => res.json())
-    .then(() => this.fetchChatroom())
-    .then(() => this.setState({
-      inputMessage:''
-    }))
-  }
-
-  fetchChatroom(){
-    console.log("fetch");
-    fetch(`http://localhost:3000/api/v1/chatrooms/${this.props.currentChatroom.id}`)
-    .then(res => res.json())
-    .then(res => (this.props.setChatroom(res))
-    )
-  }
+import MessageContainer from './MessageContainer'
+// import { ActionCableConsumer } from 'react-actioncable-provider'
 
 
-  getMessages(){
-    console.log("GetMessages");
-
-    return(
-      this.props.currentChatroom.messages.map(message => {
-        return (
-          <div
-            key={message.id}
-            id={message.id}>
-              {message.username}:
-              {message.message_content}
-
-          </div>
-        )
-      })
-    )
-  }
-
-  // renderMessages(){
-  //
-  // }
-
-  addMessage(message){
-    console.log("addMessage: ", message)
-  }
+class Client extends React.Component {
 
   render(){
-    return(
-      <div className="feed">
-      <ActionCable
-      channel={{channel: 'MessageChannel'}}
-      onReceived={() => {
-        this.fetchChatroom()
-      }} />
-        <Comment.Group>
-          <Header>
-          { (this.props.currentChatroom) ?
-              this.props.currentChatroom.name
-            :
-              null
-          }
-          </Header>
-          { (this.props.currentChatroom) ?
-              this.getMessages()
-            :
-              null
-          }
-          { (this.props.currentChatroom) ?
-              <Form reply onSubmit={(e) => this.handleSubmit(e)}>
-                <Form.TextArea onChange={this.handleChange} value={this.state.inputMessage} name="inputMessage" placeholder="Write a message here."/>
-                <Button content='Add Reply' labelPosition='left' icon='edit' primary />
-              </Form>
-            :
-              <div>Select a chatroom</div>
-          }
-
-        </Comment.Group>
-      </div>
+    // console.log("RENDERING")
+    return (
+      <Fragment>
+        <MessageContainer />
+      </Fragment>
     )
   }
-}  // End of Client Component
+} // End of Client component
 
 const mapStateToProps = (state) => {
   return {
     currentUser: state.currentUser,
-    currentChatroom: state.currentChatroom
+    currentChatroom: state.currentChatroom,
+    currentMessages: state.currentMessages
   }
 }
 const mapDispatchToProps = {
-    // setUser: (user) => ({type: 'CHANGE_USER', payload: user}),
-    setChatroom: (chatroom) => ({type: 'CHANGE_CHATROOM', payload: chatroom})
+    setChatroom: (chatroom) => ({type: 'CHANGE_CHATROOM', payload: chatroom}),
+    addMessage: (message) => ({type: 'ADD_MESSAGE', payload: message})
 }
-
 export default connect(mapStateToProps, mapDispatchToProps)(Client)

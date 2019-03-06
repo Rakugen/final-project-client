@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
-import { Button, Form, Modal, Icon, Menu } from 'semantic-ui-react'
-import { Link } from 'react-router-dom'
+import { Button, Form, Modal, Icon, Menu, Image } from 'semantic-ui-react'
+import { Link, withRouter } from 'react-router-dom'
 
 const DEFAULT_STATE = {
   open: false,
   username: '',
   password: '',
-  passwordConfirmation: ''
+  passwordConfirmation: '',
+  color: ''
 }
 
 class AppHeader extends Component {
@@ -15,7 +16,8 @@ class AppHeader extends Component {
   show = dimmer => () => this.setState({
     dimmer,
     open: true,
-    username: this.props.currentUser.username
+    username: this.props.currentUser.username,
+    color: this.props.currentUser.color
   })
   close = () => this.setState({ open: false })
 
@@ -27,35 +29,38 @@ class AppHeader extends Component {
 
   deleteUser = () => {
     console.log("DELETE USER");
+    //Need to remove all Joins with associated ID
   }
 
   editUser = (e) => {
     // e.preventDefault()
     console.log("editting user", this.state)
-    // if (this.state.password === this.state.passwordConfirmation){
-    // fetch(`http://localhost:3000/api/v1/users/${this.props.currentUser.id}`, {
-    //   method: "PATCH",
-    //   headers: {
-    //     'Content-Type': "application/json",
-    //     'Accept': "application/json"
-    //   },
-    //   body: JSON.stringify({
-    //     username: this.state.username,
-    //     password: this.state.password
-    //   })
-    // })
-    // .then(res => res.json())
-    // .then((response) => {
-    //   if (response.errors){
-    //     alert(response.errors)
-    //   } else {
-    //     // localStorage.setItem("token", response.token)
-    //     this.props.setUser(response.user)
-    //   }
-    // })
-    // } else {
-    //   alert("Passwords do not match!!")
-    // }
+    if (this.state.password === this.state.passwordConfirmation){
+    fetch(`http://${window.location.hostname}:3000/api/v1/users/${this.props.currentUser.id}`, {
+      method: "PATCH",
+      headers: {
+        'Content-Type': "application/json",
+        'Accept': "application/json"
+      },
+      body: JSON.stringify({
+        color: this.state.color,
+        username: this.state.username,
+        password: this.state.password
+      })
+    })
+    .then(res => res.json())
+    .then((response) => {
+      if (response.errors){
+        alert(response.errors)
+      } else {
+        // localStorage.setItem("token", response.token)
+        // this.props.setUser(response.user)
+        this.setState(DEFAULT_STATE)
+      }
+    })
+    } else {
+      alert("Passwords do not match!!")
+    }
   }
 
   render(){
@@ -63,7 +68,7 @@ class AppHeader extends Component {
     return(
       <Menu inverted className="app-header">
         <Menu.Item name='gamepad'>
-          <Icon name='hand point down outline' />
+          <Image src='duck_logo.png' />
           Quack
         </Menu.Item>
         { !this.props.currentUser ?
@@ -89,7 +94,7 @@ class AppHeader extends Component {
             </Menu.Item>
           </Menu.Menu>
         }
-        <Modal dimmer={dimmer} open={open} onClose={this.close}>
+        <Modal size="tiny" dimmer={dimmer} open={open} onClose={this.close}>
           <Modal.Header>Edit User</Modal.Header>
           <Modal.Actions>
             <Form >
@@ -102,8 +107,12 @@ class AppHeader extends Component {
                  <input onChange={this.handleChange} type="password" name="password" value={this.state.password} />
               </Form.Field>
               <Form.Field>
-                 <label>Password</label>
+                 <label>Confirm Password</label>
                  <input onChange={this.handleChange} type="password" name="passwordConfirmation" value={this.state.passwordConfirmation} />
+              </Form.Field>
+              <Form.Field>
+                 <label>Color</label>
+                 <input onChange={this.handleChange} name="color" value={this.state.color} />
               </Form.Field>
             </Form>
             <Button color='red' onClick={this.deleteUser}>
@@ -136,4 +145,4 @@ const mapDispatchToProps = {
     setUser: (user) => ({type: 'CHANGE_USER', payload: user})
     // setChatroom: (chatroom) => ({type: 'CHANGE_CHATROOM', payload: chatroom})
 }
-export default connect(mapStateToProps, mapDispatchToProps)(AppHeader)
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(AppHeader))
