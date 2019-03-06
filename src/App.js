@@ -9,13 +9,14 @@ import SignUpForm from './components/SignUpForm.js'
 import { Grid } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { Switch, Route, withRouter} from "react-router-dom";
+import { ActionCableConsumer } from 'react-actioncable-provider'
 
 class App extends Component {
 
   componentDidMount(){
     let token = localStorage.getItem("token")
     if (token){
-      fetch(`http://localhost:3000/api/v1/current_user`, {
+      fetch(`http://${window.location.hostname}:3000/api/v1/current_user`, {
         headers: {
           "Authorization": token
         }
@@ -31,13 +32,15 @@ class App extends Component {
 
   renderComponents(){
     return(
-      <Grid divided>
-        <Grid.Column width={4}>
-          <SideBar />
-        </Grid.Column>
-        <Grid.Column width={12}>
-          <Client />
-        </Grid.Column>
+      <Grid className='grid'>
+        <Grid.Row className="sidebar" stretched>
+          <Grid.Column color="grey" width={4}>
+            <SideBar />
+          </Grid.Column>
+          <Grid.Column textAlign="left" width={12}>
+            <Client />
+          </Grid.Column>
+        </Grid.Row>
       </Grid>
     )
   }
@@ -50,9 +53,17 @@ class App extends Component {
 
   render() {
     // console.log("App : my props are: ", this.props);
+    // let audio = new Audio('filename.mp3')
+    // audio.play()
     return (
       <div className="App">
-        <AppHeader logout={this.logout}/>
+        <ActionCableConsumer
+          channel={{channel: 'MessageChannel', id: this.props.currentChatroom ? this.props.currentChatroom.id : 0}}
+          onReceived={(response) => {
+            this.props.addMessage(response)
+          }}
+        />
+        <AppHeader className="sticky" logout={this.logout}/>
         <Switch>
           <Route exact path="/" render={()=> this.renderComponents()} />
           <Route path="/login" render={(routerProps) => <LoginForm login={this.login} {...routerProps}/>}/>
@@ -70,8 +81,9 @@ const mapStateToProps = (state) => {
   }
 }
 const mapDispatchToProps = {
-    setUser: (user) => ({type: 'CHANGE_USER', payload: user})
-    // setChatroom: (chatroom) => ({type: 'CHANGE_CHATROOM', payload: chatroom})
+    setUser: (user) => ({type: 'CHANGE_USER', payload: user}),
+    setChatroom: (chatroom) => ({type: 'CHANGE_CHATROOM', payload: chatroom}),
+    addMessage: (message) => ({type: 'ADD_MESSAGE', payload: message})
 }
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App))

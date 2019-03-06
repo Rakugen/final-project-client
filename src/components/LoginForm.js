@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Grid, Button, Form } from 'semantic-ui-react'
+import { Header, Segment, Grid, Button, Form } from 'semantic-ui-react'
 import { withRouter} from "react-router-dom"
 
 const DEFAULT_STATE = {
@@ -12,8 +12,7 @@ class LoginForm extends Component {
   state = DEFAULT_STATE
 
   login = (e) => {
-    console.log("LOGGING IN")
-    fetch("http://localhost:3000/api/v1/login", {
+    fetch(`http://${window.location.hostname}:3000/api/v1/login`, {
       method: "POST",
       headers: {
         'Content-Type': "application/json",
@@ -44,32 +43,64 @@ class LoginForm extends Component {
 
   render(){
     return (
-      <Grid columns='three' divided>
-        <Grid.Row>
-          <Grid.Column>
+      <div className="login-form">
+        <Grid textAlign='center' style={{ height: '100%' }} verticalAlign='middle'>
+          <Grid.Column style={{ maxWidth: 450 }}>
+            <Header as='h2' color='orange' textAlign='center'>
+              Log-in to Your Account
+            </Header>
+            <Form size='large' onSubmit={(e) => this.login(e)}>
+              <Segment stacked>
+                <Form.Input
+                  fluid
+                  icon='user'
+                  iconPosition='left'
+                  onChange={this.handleChange}
+                  name="username"
+                  placeholder='Username'
+                />
+                <Form.Input
+                  fluid
+                  icon='lock'
+                  iconPosition='left'
+                  placeholder='Password'
+                  type='password'
+                  name='password'
+                  onChange={this.handleChange}
+                />
+                <Button color='orange' fluid size='large'>
+                  Login
+                </Button>
+              </Segment>
+            </Form>
           </Grid.Column>
-          <Grid.Column>
-          <Form onSubmit={(e) => this.login(e)}>
-          <Form.Field>
-          <label>Username</label>
-          <input onChange={this.handleChange} name="username" placeholder='Username' />
-          </Form.Field>
-          <Form.Field>
-          <label>Password</label>
-          <input onChange={this.handleChange} type="password" name="password" placeholder='Password' />
-          </Form.Field>
-          <Button color='orange' type="submit" >Log In!</Button>
-          </Form>
-
-          </Grid.Column>
-          <Grid.Column>
-          </Grid.Column>
-
-        </Grid.Row>
-      </Grid>
+        </Grid>
+      </div>
     )
   }
 }
+
+// <Grid columns='three' centered>
+//   <Grid.Row>
+//     <Grid.Column>
+//     </Grid.Column>
+//     <Grid.Column>
+//       <Form onSubmit={(e) => this.login(e)}>
+//         <Form.Field>
+//           <label>Username</label>
+//           <input onChange={this.handleChange} name="username" placeholder='Username' />
+//         </Form.Field>
+//         <Form.Field>
+//           <label>Password</label>
+//           <input onChange={this.handleChange} type="password" name="password" placeholder='Password' />
+//         </Form.Field>
+//         <Button color='orange' type="submit" >Log In!</Button>
+//       </Form>
+//     </Grid.Column>
+//     <Grid.Column>
+//     </Grid.Column>
+//   </Grid.Row>
+// </Grid>
 
 const mapStateToProps = (state) => {
   return {
@@ -78,8 +109,6 @@ const mapStateToProps = (state) => {
   }
 }
 const mapDispatchToProps = {
-    // login: (username, password) =>
-    //   ({type: 'LOGIN', username: username, password: password})
     setUser: (user) => ({type: 'CHANGE_USER', payload: user})
 }
 

@@ -1,5 +1,7 @@
 .App {
   text-align: center;
+  /* background-image: url("https://i.pinimg.com/originals/fb/27/c5/fb27c57aa0fa9ed1b8469a544dfcc5ad.jpg"); */
+
 }
 
 .App-logo {
@@ -23,6 +25,59 @@
   color: #61dafb;
 }
 
+.author{
+  background-color: grey;
+  padding: 6px;
+  border-radius: 15px 15px 0px 0px;
+
+}
+
+.login-form{
+  height: 100%;
+}
+
+.feed{
+  height: 500px;
+  width: 100%;
+  margin: .15%;
+  height: 93vh;
+  padding-right: 30px;
+  overflow: scroll;
+  overflow-x: hidden;
+}
+
+.label{
+  width: 80%;
+}
+
+.sidebar-button{
+  width: 80%;
+}
+
+.sidebar {
+  height: 100vh;
+}
+
+.padding{
+  padding: 6px;
+}
+
+.comment-right{
+  text-align: right;
+  /* background-color: orange; */
+  border-radius: 15px;
+}
+.comment-left{
+  text-align: left;
+  /* background-color: green; */
+  border-radius: 15px;
+}
+
+.sticky{
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

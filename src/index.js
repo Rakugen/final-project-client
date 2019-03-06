@@ -22,6 +22,13 @@ const reducer = (state = {currentUser: null, currentChatroom: null}, action) => 
     case 'CHANGE_CHATROOM':
       return {...state,
         currentChatroom: action.payload}
+    case 'ADD_MESSAGE':
+      return {...state,
+        currentChatroom: {
+          ...state.currentChatroom,
+          messages: [...state.currentChatroom.messages, action.payload]
+        }
+      }
     default:
       return state
   }
@@ -30,13 +37,13 @@ const reducer = (state = {currentUser: null, currentChatroom: null}, action) => 
 const store = createStore(reducer)
 
 ReactDOM.render(
-  <ActionCableProvider url="ws://localhost:3000/cable">
   <Router>
+  <ActionCableProvider url={`ws://${window.location.hostname}:3000/cable`}>
   <Provider store={store}>
     <App />
   </Provider>
-  </Router>
   </ActionCableProvider>
+  </Router>
   ,document.getElementById('root')
 );
 
