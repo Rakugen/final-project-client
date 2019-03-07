@@ -69,7 +69,7 @@ class AppHeader extends Component {
       <Menu inverted className="app-header">
         <Menu.Item name='gamepad'>
           <Image src='duck_logo.png' />
-          Quack
+          <Link to="/homepage">Quack</Link>
         </Menu.Item>
         { !this.props.currentUser ?
           <Menu.Menu position="right">

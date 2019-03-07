@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 import 'semantic-ui-css/semantic.min.css'
+import Homepage from './components/Homepage.js'
 import AppHeader from './components/AppHeader.js'
 import SideBar from './components/SideBar.js'
 import Client from './components/Client.js'
@@ -26,7 +27,7 @@ class App extends Component {
         this.props.setUser(res)
       })
     } else {
-      this.props.history.push("/login")
+      this.props.history.push("/homepage")
     }
   }
 
@@ -66,6 +67,7 @@ class App extends Component {
         <AppHeader className="sticky" logout={this.logout}/>
         <Switch>
           <Route exact path="/" render={()=> this.renderComponents()} />
+          <Route path="/homepage" render={() => <Homepage />} />
           <Route path="/login" render={(routerProps) => <LoginForm login={this.login} {...routerProps}/>}/>
           <Route path="/signup" render={(routerProps) => <SignUpForm signup={this.signup} {...routerProps}/>}/>
         </Switch>

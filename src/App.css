@@ -78,6 +78,19 @@
   top: 0;
   width: 100%;
 }
+
+.homepage-bg{
+  background-size: 100%;
+  background-repeat: no-repeat;
+  background-image: url('duck2.jpg');
+  height: 600px;
+  width: auto;
+}
+
+.card-group{
+  padding-top: 200px;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
