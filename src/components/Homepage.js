@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Header, Card, Icon, Image } from 'semantic-ui-react'
+import { Header, Card, Image } from 'semantic-ui-react'
 
 class Homepage extends Component{
 
@@ -7,7 +7,7 @@ class Homepage extends Component{
     return(
       <>
         <div className="homepage-bg">
-          <Header style={{'font-size': '4em'}}>Welcome to Quack!</Header>
+          <Header style={{'fontSize': '4em'}}>Welcome to Quack!</Header>
           <Card.Group centered className="card-group">
             <Card>
               <Image size="tiny" src='1600110.svg' centered />

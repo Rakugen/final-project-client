@@ -53,7 +53,6 @@ class App extends Component {
 	}
 
   render() {
-    // console.log("App : my props are: ", this.props);
     // let audio = new Audio('filename.mp3')
     // audio.play()
     return (

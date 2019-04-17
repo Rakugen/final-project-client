@@ -33,7 +33,6 @@ class AppHeader extends Component {
   }
 
   editUser = (e) => {
-    // e.preventDefault()
     console.log("editting user", this.state)
     if (this.state.password === this.state.passwordConfirmation){
     fetch(`http://${window.location.hostname}:3000/api/v1/users/${this.props.currentUser.id}`, {

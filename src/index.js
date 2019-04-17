@@ -8,8 +8,8 @@ import { Provider } from 'react-redux'
 import { BrowserRouter as Router } from 'react-router-dom'
 import { ActionCableProvider } from 'react-actioncable-provider'
 
+// Redux reducer
 const reducer = (state = {currentUser: null, currentChatroom: null}, action) => {
-
   switch(action.type) {
     case 'CHANGE_USER':
       if (action.payload === null){
@@ -33,7 +33,7 @@ const reducer = (state = {currentUser: null, currentChatroom: null}, action) => 
       return state
   }
 }
-
+// Redux store
 const store = createStore(reducer)
 
 ReactDOM.render(

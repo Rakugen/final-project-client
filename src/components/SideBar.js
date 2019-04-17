@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
-import { Icon, Label, Table, Form, Button, Comment, Header, Modal } from 'semantic-ui-react'
+import { Label, Table, Form, Button, Comment, Header, Modal } from 'semantic-ui-react'
 
 const DEFAULT_STATE = {
   openNewModal: false,
@@ -9,21 +9,6 @@ const DEFAULT_STATE = {
   description: '',
   dimmer: null
 }
-// const COLORS = [
-//   'red',
-//   'orange',
-//   'yellow',
-//   'olive',
-//   'green',
-//   'teal',
-//   'violet',
-//   'purple',
-//   'pink',
-//   'brown',
-//   // 'grey',
-//   // 'blue',
-//   // 'black',
-// ]
 
 class SideBar extends Component {
   state = {...DEFAULT_STATE, chatrooms: [], userChatroomIDs: []}
