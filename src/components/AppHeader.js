@@ -33,7 +33,6 @@ class AppHeader extends Component {
   }
 
   editUser = (e) => {
-    // e.preventDefault()
     console.log("editting user", this.state)
     if (this.state.password === this.state.passwordConfirmation){
     fetch(`http://${window.location.hostname}:3000/api/v1/users/${this.props.currentUser.id}`, {
@@ -69,7 +68,7 @@ class AppHeader extends Component {
       <Menu inverted className="app-header">
         <Menu.Item name='gamepad'>
           <Image src='duck_logo.png' />
-          Quack
+          <Link to="/homepage">Quack</Link>
         </Menu.Item>
         { !this.props.currentUser ?
           <Menu.Menu position="right">
